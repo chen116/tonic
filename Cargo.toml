@@ -3,6 +3,7 @@ members = [
     "tonic",
     "tonic-build",
     "tonic-health",
+    "tonic-reflection",
 
     # Non-published crates
     "examples",
