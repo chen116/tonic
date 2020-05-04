@@ -12,6 +12,7 @@ pub fn configure() -> Builder {
     Builder {
         build_client: true,
         build_server: true,
+        include_file_descriptors: false,
         out_dir: None,
         extern_path: Vec::new(),
         field_attributes: Vec::new(),
@@ -180,6 +181,7 @@ impl prost_build::ServiceGenerator for ServiceGenerator {
 pub struct Builder {
     pub(crate) build_client: bool,
     pub(crate) build_server: bool,
+    pub(crate) include_file_descriptors: bool,
     pub(crate) extern_path: Vec<(String, String)>,
     pub(crate) field_attributes: Vec<(String, String)>,
     pub(crate) type_attributes: Vec<(String, String)>,
@@ -207,6 +209,13 @@ impl Builder {
     #[cfg(feature = "rustfmt")]
     pub fn format(mut self, run: bool) -> Self {
         self.format = run;
+        self
+    }
+
+    /// Include constant byte slices with encoded `prost_types::FileDescriptorProto` for
+    /// each module.
+    pub fn include_file_descriptors(mut self, include: bool) -> Self {
+        self.include_file_descriptors = include;
         self
     }
 
@@ -287,6 +296,9 @@ impl Builder {
         let format = self.format;
 
         config.out_dir(out_dir.clone());
+        if self.include_file_descriptors {
+            config.include_file_descriptor();
+        }
         for (proto_path, rust_path) in self.extern_path.iter() {
             config.extern_path(proto_path, rust_path);
         }
